@@ -58,12 +58,14 @@ const Chart = () => {
   const dispatch = useDispatch();
   const [newData, setNewData] = React.useState([]);
   const [merged, setMerged] = React.useState([]);
+
   const updatedMetricNames = metricNames
     ? metricNames.map(item => {
         item.after = heartBeat - 1800000;
         return item;
       })
     : null;
+  
   const [result, executeQuery] = useQuery({
     query,
     skip: !updatedMetricNames,
@@ -73,6 +75,7 @@ const Chart = () => {
   });
 
   const { data, error } = result;
+
   useEffect(() => {
     setNewData([]);
     if (error) {
@@ -85,14 +88,16 @@ const Chart = () => {
       return newData.push(item.measurements);
     });
     let merged = [].concat.apply([], newData);
-    merged.map(item => {
-      item[item.metric] = item.value;
-    });
+    // merged.map(item => {
+    //   item[item.metric] = item.value;
+    // });
+    merged.map(item => item[item.metric] = item.value);
     setMerged(merged);
-  }, [dispatch, data, error, executeQuery]);
+  }, [dispatch, data, error, executeQuery, newData]);
   let xAxisTickFormatter = date => {
     return moment.unix(date).format("hh:mm");
   };
+
   return (
     <Fragment>
       <ResponsiveContainer width="100%" maxHeight={500}>
@@ -194,6 +199,8 @@ const Chart = () => {
                       dot={false}
                     />
                   );
+                } else {
+                  return null;
                 }
               })
             : null}

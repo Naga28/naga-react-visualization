@@ -6,6 +6,9 @@ import { Provider, createClient, useQuery } from 'urql';
 import { useDispatch } from 'react-redux';
 import * as actions from '../../store/actions';
 
+/* import { defaultExchanges, subscriptionExchange, useSubscription } from "urql";
+import { SubscriptionClient } from "subscriptions-transport-ws"; */
+
 const useStyles = makeStyles(theme => ({
     root: {
         padding: theme.spacing(3, 2)
@@ -15,8 +18,22 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
+/* const subscriptionClient = new SubscriptionClient(
+    "ws://react.eogresources.com/graphql",
+    {
+        reconnect: true,
+        timeout: 20000
+    }
+); */
+
 const client = createClient({
-    url: 'https://react.eogresources.com/graphql'
+    url: 'https://react.eogresources.com/graphql',
+    /*  exchanges: [
+        ...defaultExchanges,
+        subscriptionExchange({
+            forwardSubscription: operation => subscriptionClient.request(operation)
+        })
+    ] */
 });
 
 const LastKnownMeasurement = props => {
@@ -32,6 +49,17 @@ const LastKnownMeasurement = props => {
 		  }
 		}
 		`;
+
+        /* const querySubscription = `
+        subscription ($metricName: String!) {
+          getLastKnownMeasurement(metricName: $metricName) {
+            metric
+            value
+            unit
+            at
+          }
+        }
+        `; */
 
     const dispatch = useDispatch();
 
@@ -61,6 +89,17 @@ const LastKnownMeasurement = props => {
         }, 1500);
         return () => clearInterval(interval);
     }, [dispatch, data, error, executeQuery]);
+
+    /* const [res] = useSubscription({
+        query: querySubscription,
+         variables: {
+            metricName: props.metricName
+        }
+    })
+    
+    console.log("======")
+    console.log(res.data?.getLastKnownMeasurement)
+    console.log("+++++"); */
 
     return ( 
         <div className={classes.mcardDiv}> 
